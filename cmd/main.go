@@ -6,6 +6,7 @@ import (
 	"github.com/azybk/simple-forum/internal/configs"
 	"github.com/azybk/simple-forum/internal/handler/memberships"
 	membershipRepo "github.com/azybk/simple-forum/internal/repository/memberships"
+	membershipService "github.com/azybk/simple-forum/internal/service/memberships"
 	"github.com/azybk/simple-forum/pkg/internalsql"
 	"github.com/gin-gonic/gin"
 )
@@ -33,9 +34,10 @@ func main() {
 		log.Fatal("Gagal inisiasi database", err)
 	}
 
-	_ = membershipRepo.NewRepository(db)
+	membershipRepo := membershipRepo.NewRepository(db)
+	membershipService := membershipService.NewService(membershipRepo)
 
-	memberships := memberships.NewHandler(r)
+	memberships := memberships.NewHandler(r, membershipService)
 	memberships.RegisterRoute()
 
 	r.Run(cfg.Service.Port)
